@@ -39,39 +39,48 @@
 - `models/YOLO11n-seg.pt`
 - `models/YOLO11s-seg.pt`
 
-当前本地检测到的 Python 环境如下：
+当前使用的运行环境为 Conda 环境 `yolov11`：
 
 | 环境 / 库 | 当前版本 | 说明 |
 | --- | --- | --- |
-| Python | 3.11.1 | 当前命令行环境 |
+| Conda 环境 | yolov11 | 项目运行环境 |
+| Python | 3.10.19 | `D:\Anaconda\envs\yolov11\python.exe` |
 | Flask | 3.1.3 | 后端 Web 服务 |
-| opencv-python | 4.10.0.84 | 图像、视频读取与处理 |
-| numpy | 1.24.1 | 数值计算与图像数组处理 |
-| ultralytics | 未在当前 Python 环境中检测到 | YOLO11 推理依赖，运行项目前需要安装 |
-| torch | 未在当前 Python 环境中检测到 | Ultralytics/PyTorch 推理依赖，运行项目前需要安装 |
-| torchvision | 未在当前 Python 环境中检测到 | PyTorch 视觉工具包，可随 PyTorch 环境安装 |
-| torchaudio | 未在当前 Python 环境中检测到 | PyTorch 音频工具包，非本项目核心依赖 |
+| ultralytics | 8.3.40 | YOLO11 推理框架 |
+| opencv-python | 4.8.1.78 | 图像、视频读取与处理 |
+| numpy | 1.26.4 | 数值计算与图像数组处理 |
+| torch | 2.0.0+cu118 | PyTorch 推理后端，CUDA 11.8 版本 |
+| torchvision | 0.15.1+cu118 | PyTorch 视觉工具包，CUDA 11.8 版本 |
+| torchaudio | 未安装 | 非本项目核心依赖 |
 
 > 说明：`backend/app.py` 中直接依赖 `flask`、`opencv-python`、`numpy`、`ultralytics`。其中 `ultralytics` 会使用 PyTorch 作为推理后端，因此运行 YOLO11 检测前需要安装匹配的 PyTorch 环境。
 
 ## 环境安装
 
-建议使用虚拟环境运行：
+建议使用 Conda 环境 `yolov11` 运行：
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install flask==3.1.3 opencv-python==4.10.0.84 numpy==1.24.1 ultralytics
+conda activate yolov11
+python backend\app.py
 ```
 
-如果需要 GPU 推理，请根据 CUDA 版本安装对应的 PyTorch 版本，然后再安装或使用 `ultralytics`。CPU 环境也可以运行，但视频检测和大模型推理速度会较慢。
+如需重新创建环境，可参考以下依赖版本安装：
+
+```powershell
+conda create -n yolov11 python=3.10
+conda activate yolov11
+pip install flask==3.1.3 ultralytics==8.3.40 opencv-python==4.8.1.78 numpy==1.26.4
+pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+```
+
+如果使用 CPU 环境，也可以安装 CPU 版本 PyTorch，但视频检测和大模型推理速度会较慢。
 
 ## 启动项目
 
 在项目根目录执行：
 
 ```powershell
+conda activate yolov11
 python backend\app.py
 ```
 
