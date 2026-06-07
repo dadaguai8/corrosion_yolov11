@@ -614,6 +614,9 @@ async function startCamera() {
     video.srcObject = state.stream;
     video.autoplay = true;
     video.controls = false;
+    video.style.display = "block";
+    canvas.style.display = "block";
+    showEmpty(false);
     await video.play();
     $("fileName").textContent = "浏览器摄像头";
     setStatus("摄像头已启动", "ready");
@@ -632,6 +635,8 @@ function stopCamera() {
   video.removeAttribute("autoplay");
   video.load();
   video.style.display = "none";
+  canvas.style.display = "block";
+  showEmpty(true);
   stopRealtime();
 }
 
@@ -659,10 +664,10 @@ function switchSource(source) {
   $("sourceLabel").textContent = sourceLabels[source];
   $("fileName").textContent = "等待输入";
   hidePreviewNavigator();
-  video.style.display = source === "video" || source === "camera" ? "block" : "none";
-  canvas.style.display = source === "video" ? "none" : "block";
+  video.style.display = "none";
+  canvas.style.display = "block";
   clearCanvas();
-  showEmpty(source !== "video" && source !== "camera");
+  showEmpty(true);
   if (source === "video" || source === "camera") {
     hidePreviewNavigator();
   }
