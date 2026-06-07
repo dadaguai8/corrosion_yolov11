@@ -123,6 +123,15 @@ http://127.0.0.1:5000
 
 如需替换模型，可将训练好的 YOLO11 分割权重放入 `models/` 目录，或通过页面上传模型文件。
 
+## 数据集来源
+
+本项目使用的腐蚀检测数据集来自 Roboflow Universe：
+
+- 数据集名称：`cor`
+- 数据集类型：Instance Segmentation
+- 数据集类别：Crevice Corrosion、Pitting Corrosion、Uniform Corrosion
+- 数据集地址：<https://universe.roboflow.com/sem-l2uic/cor-oumk1>
+
 ## 注意事项
 
 - 首次加载模型和首次推理可能较慢，属于正常现象。
