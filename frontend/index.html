@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>工业腐蚀检测系统</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="side-panel">
+        <div class="brand">
+          <h1>工业腐蚀检测系统</h1>
+        </div>
+
+        <section class="panel-section">
+          <div class="section-title"><span>1</span><h2>模型选择</h2></div>
+          <label class="field-label" for="modelSelect">当前模型</label>
+          <select id="modelSelect">
+            <option value="">正在连接后端</option>
+          </select>
+          <p class="model-hint">支持 .pt / .onnx / .engine 权重文件</p>
+          <label class="file-row custom-model" for="modelFile">
+            <input id="modelFile" type="file" accept=".pt,.onnx,.engine" />
+            <span>选择权重文件</span>
+          </label>
+          <div class="model-metrics">
+            <div><strong id="mapValue">--</strong><span>mAP50</span></div>
+            <div><strong id="fpsValue">--</strong><span>FPS</span></div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-title"><span>2</span><h2>检测源</h2></div>
+          <div class="source-tabs" role="tablist" aria-label="检测源">
+            <button class="tab-button active" data-source="image" type="button">图片</button>
+            <button class="tab-button" data-source="folder" type="button">文件夹</button>
+            <button class="tab-button" data-source="video" type="button">视频</button>
+            <button class="tab-button" data-source="camera" type="button">摄像头</button>
+          </div>
+
+          <div class="source-pane active" data-pane="image">
+            <label class="upload-zone" for="imageInput">
+              <input id="imageInput" type="file" accept="image/*" />
+              <span class="upload-icon">+</span>
+              <strong>上传腐蚀图片</strong>
+              <small>JPG / PNG / BMP</small>
+            </label>
+          </div>
+
+          <div class="source-pane" data-pane="folder">
+            <label class="upload-zone" for="folderInput">
+              <input id="folderInput" type="file" accept="image/*" webkitdirectory multiple />
+              <span class="upload-icon">+</span>
+              <strong>选择图片文件夹</strong>
+              <small>批量检测所有图片</small>
+            </label>
+          </div>
+
+          <div class="source-pane" data-pane="video">
+            <label class="upload-zone" for="videoInput">
+              <input id="videoInput" type="file" accept="video/*" />
+              <span class="upload-icon">+</span>
+              <strong>上传巡检视频</strong>
+              <small>MP4 / AVI / MOV</small>
+            </label>
+          </div>
+
+          <div class="source-pane" data-pane="camera">
+            <button id="cameraButton" class="ghost-button" type="button">启动摄像头</button>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-title"><span>3</span><h2>检测参数</h2></div>
+          <label class="range-field">
+            <span>置信度 <b id="confText">0.45</b></span>
+            <input id="confidence" type="range" min="0.1" max="0.9" step="0.05" value="0.45" />
+          </label>
+          <label class="range-field">
+            <span>IOU 阈值 <b id="iouText">0.50</b></span>
+            <input id="iou" type="range" min="0.1" max="0.9" step="0.05" value="0.5" />
+          </label>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h2>YOLO11 工业表面腐蚀识别</h2>
+          </div>
+          <div class="actions">
+            <button id="detectButton" class="primary-button" type="button">开始检测</button>
+            <button id="saveButton" class="secondary-button" type="button" disabled>保存结果</button>
+            <button id="reportButton" class="secondary-button" type="button" disabled>检测报告</button>
+          </div>
+        </header>
+
+        <div class="content-grid">
+          <section class="preview-panel">
+            <div class="preview-toolbar">
+              <div>
+                <span id="sourceLabel">图片检测</span>
+                <strong id="fileName">等待输入</strong>
+              </div>
+              <div id="folderNavigator" class="folder-navigator" hidden>
+                <button id="prevImageButton" type="button" aria-label="上一张">‹</button>
+                <span id="folderPosition">0 / 0</span>
+                <button id="nextImageButton" type="button" aria-label="下一张">›</button>
+              </div>
+              <span id="statusBadge" class="status-badge">后端未连接</span>
+            </div>
+            <div class="preview-stage">
+              <canvas id="resultCanvas" width="960" height="600"></canvas>
+              <video id="videoPreview" muted playsinline controls></video>
+              <div id="emptyState" class="empty-state"></div>
+            </div>
+          </section>
+
+          <aside class="result-panel">
+            <div class="summary-grid">
+              <div><span>检测目标</span><strong id="countValue">0</strong></div>
+              <div><span>平均置信度</span><strong id="avgValue">0%</strong></div>
+              <div><span>腐蚀类型</span><strong id="typeValue">0类</strong></div>
+              <div><span>处理耗时</span><strong id="timeValue">0 ms</strong></div>
+              <div><span>总面积占比</span><strong id="areaValue">0%</strong></div>
+              <div><span>严重程度</span><strong id="severityValue">未检测</strong></div>
+            </div>
+
+            <div class="chart-block">
+              <div class="chart-title">腐蚀类型分布</div>
+              <div class="bar-row"><span>缝隙</span><div><i id="creviceBar"></i></div><b id="creviceCount">0</b></div>
+              <div class="bar-row"><span>点蚀</span><div><i id="pittingBar"></i></div><b id="pittingCount">0</b></div>
+              <div class="bar-row"><span>均匀</span><div><i id="uniformBar"></i></div><b id="uniformCount">0</b></div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>类别</th><th>置信度</th><th>面积占比</th><th>位置</th></tr></thead>
+                <tbody id="resultRows"><tr><td colspan="4">暂无检测结果</td></tr></tbody>
+              </table>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
